@@ -7,6 +7,9 @@ from os import walk
 class XMLLex:
     tokens = ("TEXT", "OTAGS", "CTAGS")
 
+    def write_tag(self, tag, write):
+        self.dic[self.currentHeader][self.currentWord][tag] = write
+
     def t_TEXT(self, t):
         r"[^<]+"
 
@@ -17,11 +20,11 @@ class XMLLex:
             self.dic[self.currentHeader][t.value] = {'palavra': t.value.strip()}
             self.currentWord = t.value
         elif self.switch.isDef:
-            self.dic[self.currentHeader][self.currentWord]['def'] = self.dic[self.currentHeader][self.currentWord].get('def', '') + t.value.strip()
+            self.write_tag(self.currentTag, self.dic[self.currentHeader][self.currentWord].get('def', '') + t.value.strip())
         elif self.currentTag == "gramGrp":
-            self.dic[self.currentHeader][self.currentWord][self.currentTag] = t.value.strip()
+            self.write_tag(self.currentTag, t.value.strip())
         elif self .currentTag == "etym":
-            self.dic[self.currentHeader][self.currentWord][self.currentTag] = t.value.strip()
+            self.write_tag(self.currentTag, t.value.strip())
         return t
 
 
