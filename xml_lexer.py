@@ -3,6 +3,7 @@ import ply.lex as plex
 from switcher import Switcher
 from os import walk
 
+
 class XMLLex:
     tokens = ("TEXT", "OTAGS", "CTAGS")
 
@@ -13,24 +14,20 @@ class XMLLex:
             self.dic[t.value] = {}
             self.currentHeader = t.value
         elif self.switch.isNewWord:
-            self.dic[self.currentHeader][t.value] = {'palavra': t.value}
+            self.dic[self.currentHeader][t.value] = {'palavra': t.value.strip()}
             self.currentWord = t.value
-        elif self.currentTag == 'def':
-            self.insideDef = True
-            self.dic[self.currentHeader][self.currentWord]['def'] = t.value
-        elif self.insideDef:
-            self.dic[self.currentHeader][self.currentWord]['def'] += t.value
+        elif self.switch.isDef:
+            self.dic[self.currentHeader][self.currentWord]['def'] = self.dic[self.currentHeader][self.currentWord].get('def', '') + t.value.strip()
         elif self.currentTag == "gramGrp":
-            self.dic[self.currentHeader][self.currentWord][self.currentTag] = t.value
-
+            self.dic[self.currentHeader][self.currentWord][self.currentTag] = t.value.strip()
+        elif self .currentTag == "etym":
+            self.dic[self.currentHeader][self.currentWord][self.currentTag] = t.value.strip()
         return t
 
 
     def t_CTAGS(self, t):
         r"</[^>]+>"
         self.currentTag = ''
-        if t.value == '</def>':
-            self.insideDef = False
         self.switch.switch(t.value.replace("/",""))
         return t
 
@@ -46,36 +43,34 @@ class XMLLex:
 
         return t
 
-    """def t_definition_TEXT(self,t):
-        r"</def>"
-        print(t.value)
-        return t"""
-
-    def t_ANY_error(self, t):
+    def t_error(self, t):
         print(f"Unexpected tokens: {t.value[:10]}")
         exit(1)
 
-    def __init__(self, filename):
+    def __init__(self, filenames):
         self.lexer = None
         self.dic = {}
-        self.filename = filename
+        self.filenames = filenames
         self.switch = Switcher()
         self.currentHeader = ''
         self.currentTag = ''
-        self.insideDef = False
         self.currentWord = ''
 
     def initialize(self, **kwargs):
         self.lexer = plex.lex(module=self, **kwargs)
-        with open(f"Files/{self.filename}", "r") as fh:
-            contents = fh.read()
+        for file in filenames:
 
-        self.lexer.input(contents)
-        for token in iter(self.lexer.token, None):
-            pass
-            #print(token)
+            with open(f"Files/{file}", "r") as fh:
+                contents = fh.read()
+
+            self.lexer.input(contents)
+            for token in iter(self.lexer.token, None):
+                pass
+
+
+            print(f"Finished processing: {file[:1]}")
+
         print(self.dic)
-        print("Finished processing")
 
 
 f = []
@@ -83,5 +78,5 @@ for (dirpath, dirnames, filenames) in walk("D:\escola\Processamento de linguagen
     f.extend(filenames)
     break
 
-processor = XMLLex("A.xml")
+processor = XMLLex(f)
 processor.initialize()
