@@ -31,8 +31,8 @@ class XMLLex:
 
     def t_OTAGS(self, t):
         r"<[^>]+>"
-        if t.value in ("<def>"):
-            t.lexer.begin("definition")
+        #if t.value in ("<def>"):
+         #   t.lexer.begin("definition")
         if t.value in self.switch.options.keys():
             self.switch.switch(t.value)
             tag = t.value
