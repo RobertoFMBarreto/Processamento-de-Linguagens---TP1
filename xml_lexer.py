@@ -1,46 +1,51 @@
 # xml_lexer.py
 import ply.lex as plex
-import dictonary
+from switcher import Switcher
 from os import walk
 
 class XMLLex:
     tokens = ("TEXT", "OTAGS", "CTAGS")
-
+    #states = (("definition","exclusive"),)
 
     def t_TEXT(self, t):
         r"[^<]+"
 
-        if self.newHeader:
+        if self.switch.isNewHeader:
             self.dic[t.value] = {}
             self.currentHeader = t.value
-        elif self.newWord:
+        elif self.switch.isNewWord:
             self.dic[self.currentHeader][t.value] = {'palavra': t.value}
-        elif self.insideSomething:
-            pass
+            self.currentWord = t.value
+        elif self.currentTag in ("gramGrp","def", "quote"):
+            self.dic[self.currentHeader][self.currentWord][self.currentTag] = t.value
+
         return t
+
 
 
     def t_CTAGS(self, t):
         r"</[^>]+>"
-        if t.value == "</orth>":
-            self.newWord = False
-        elif t.value == "</head>":
-            self.newHeader = False
-        elif t.value in ("</gramGrp>", "</def>", "</quote>"):
-            self.insideSomething = False
+        self.currentTag = ''
+        self.switch.switch(t.value.replace("/",""))
         return t
 
     def t_OTAGS(self, t):
         r"<[^>]+>"
-        if t.value == "<orth>":
-            self.newWord = True
-        elif t.value == "<head>":
-            self.newHeader = True
-        elif t.value in ("<gramGrp>", "<def>", "<quote>"):
-            self.insideSomething = True
-            t.value = str(t.value).replace("<", "")
-            t.value = str(t.value).replace(">", "")
+        if t.value in ("<def>"):
+            t.lexer.begin("definition")
+        if t.value in self.switch.options.keys():
+            self.switch.switch(t.value)
+            tag = t.value
+            tag = tag.replace('<','')
+            tag = tag.replace('>','')
+            self.currentTag = tag
+
         return t
+
+    """def t_definition_TEXT(self,t):
+        r"</def>"
+        print(t.value)
+        return t"""
 
     def t_ANY_error(self, t):
         print(f"Unexpected tokens: {t.value[:10]}")
@@ -50,10 +55,10 @@ class XMLLex:
         self.lexer = None
         self.dic = {}
         self.filename = filename
-        self.newWord = False
-        self.insideSomething = False
-        self.newHeader = False
+        self.switch = Switcher()
         self.currentHeader = ''
+        self.currentTag = ''
+        self.currentWord = ''
 
     def initialize(self, **kwargs):
         self.lexer = plex.lex(module=self, **kwargs)

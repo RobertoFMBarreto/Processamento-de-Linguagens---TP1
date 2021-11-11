@@ -3,7 +3,6 @@ class Switcher:
 
     def NewWord(self):
         self.isNewWord = not self.isNewWord
-        print("new Word")
         pass
 
     def NewHeader(self):
@@ -11,7 +10,7 @@ class Switcher:
         pass
 
     def Grammer(self):
-        self.Grammer = not self.isGrammer
+        self.isGrammer = not self.isGrammer
         pass
 
     def Definition(self):
@@ -21,6 +20,14 @@ class Switcher:
     def Quote(self):
         self.isquote = not self.isquote
         pass
+
+    def switch(self, argument):
+        func = self.options.get(argument, "Invalid Argument")
+        if callable(func):
+            func()
+        return func
+
+
 
     def __init__(self):
         self.isNewWord = False
