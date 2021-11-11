@@ -5,7 +5,6 @@ from os import walk
 
 class XMLLex:
     tokens = ("TEXT", "OTAGS", "CTAGS")
-    #states = (("definition","exclusive"),)
 
     def t_TEXT(self, t):
         r"[^<]+"
@@ -16,23 +15,28 @@ class XMLLex:
         elif self.switch.isNewWord:
             self.dic[self.currentHeader][t.value] = {'palavra': t.value}
             self.currentWord = t.value
-        elif self.currentTag in ("gramGrp","def", "quote"):
+        elif self.currentTag == 'def':
+            self.insideDef = True
+            self.dic[self.currentHeader][self.currentWord]['def'] = t.value
+        elif self.insideDef:
+            self.dic[self.currentHeader][self.currentWord]['def'] += t.value
+        elif self.currentTag == "gramGrp":
             self.dic[self.currentHeader][self.currentWord][self.currentTag] = t.value
 
         return t
-# foda se
 
 
     def t_CTAGS(self, t):
         r"</[^>]+>"
         self.currentTag = ''
+        if t.value == '</def>':
+            self.insideDef = False
         self.switch.switch(t.value.replace("/",""))
         return t
 
     def t_OTAGS(self, t):
         r"<[^>]+>"
-        #if t.value in ("<def>"):
-         #   t.lexer.begin("definition")
+
         if t.value in self.switch.options.keys():
             self.switch.switch(t.value)
             tag = t.value
@@ -58,6 +62,7 @@ class XMLLex:
         self.switch = Switcher()
         self.currentHeader = ''
         self.currentTag = ''
+        self.insideDef = False
         self.currentWord = ''
 
     def initialize(self, **kwargs):
