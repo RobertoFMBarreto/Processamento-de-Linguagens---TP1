@@ -20,7 +20,7 @@ class XMLLex:
             self.dic[self.currentHeader][self.currentWord][self.currentTag] = t.value
 
         return t
-
+# foda se
 
 
     def t_CTAGS(self, t):
