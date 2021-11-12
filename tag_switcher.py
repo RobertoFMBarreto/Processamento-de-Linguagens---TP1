@@ -1,4 +1,4 @@
-class Switcher:
+class TagSwitcher:
 
     def new_word(self):
         self.isNewWord = not self.isNewWord
@@ -18,6 +18,7 @@ class Switcher:
             func()
         pass
 
+
     def __init__(self):
         self.isNewWord = False
         self.isNewHeader = False
@@ -29,4 +30,5 @@ class Switcher:
             "<def>": self.definition,
             "<etym>": '',
             "<quote>": '',
+            "<term>": '',
         }

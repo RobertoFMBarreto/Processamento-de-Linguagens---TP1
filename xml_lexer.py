@@ -1,83 +1,65 @@
 # xml_lexer.py
 import ply.lex as plex
-from switcher import Switcher
+from html_generator import HtmlGenerator
+from tag_switcher import TagSwitcher
+from text_switcher import TextSwitcher
 from os import walk
 
 
 class XMLLex:
     tokens = ("TEXT", "OTAGS", "CTAGS")
 
-    def write_tag(self, tag, write):
-        self.dic[self.currentHeader][self.currentWord][tag] = write
-
     def t_TEXT(self, t):
         r"[^<]+"
-
-        if self.switch.isNewHeader:
-            self.dic[t.value] = {}
-            self.currentHeader = t.value
-        elif self.switch.isNewWord:
-            self.dic[self.currentHeader][t.value] = {'palavra': t.value.strip()}
-            self.currentWord = t.value
-        elif self.switch.isDef:
-            self.write_tag(self.currentTag, self.dic[self.currentHeader][self.currentWord].get('def', '') + t.value.strip())
-        elif self.currentTag == "gramGrp":
-            self.write_tag(self.currentTag, t.value.strip())
-        elif self .currentTag == "etym":
-            self.write_tag(self.currentTag, t.value.strip())
-        return t
-
+        self.text_switcher.switch(t.value)
+        pass
 
     def t_CTAGS(self, t):
         r"</[^>]+>"
-        self.currentTag = ''
-        self.switch.switch(t.value.replace("/",""))
-        return t
+        self.text_switcher.currentTag = ''
+        self.tag_switcher.switch(t.value.replace("/", ""))
+        pass
 
     def t_OTAGS(self, t):
         r"<[^>]+>"
-
-        if t.value in self.switch.options.keys():
-            self.switch.switch(t.value)
+        if t.value in self.tag_switcher.options.keys():
+            self.tag_switcher.switch(t.value)
             tag = t.value
-            tag = tag.replace('<','')
-            tag = tag.replace('>','')
-            self.currentTag = tag
-
-        return t
+            tag = tag.replace('<', '')
+            tag = tag.replace('>', '')
+            self.text_switcher.currentTag = tag
+        pass
 
     def t_error(self, t):
         print(f"Unexpected tokens: {t.value[:10]}")
         exit(1)
 
-    def __init__(self, filenames):
+    def __init__(self, files):
         self.lexer = None
-        self.dic = {}
-        self.filenames = filenames
-        self.switch = Switcher()
-        self.currentHeader = ''
-        self.currentTag = ''
-        self.currentWord = ''
+        self.filenames = files
+        self.tag_switcher = TagSwitcher()
+        self.text_switcher = TextSwitcher()
+        self.htmlGenerator = HtmlGenerator()
 
     def initialize(self, **kwargs):
         self.lexer = plex.lex(module=self, **kwargs)
+
         for file in filenames:
 
             with open(f"Files/{file}", "r") as fh:
                 contents = fh.read()
 
             self.lexer.input(contents)
-            for token in iter(self.lexer.token, None):
+            for _ in iter(self.lexer.token, None):
                 pass
-
 
             print(f"Finished processing: {file[:1]}")
 
-        print(self.dic)
+        self.htmlGenerator.iterate_dictionary(self.text_switcher.dic)
 
 
 f = []
-for (dirpath, dirnames, filenames) in walk("D:\escola\Processamento de linguagens\TP1\Files"):
+for (_, _, filenames) in walk("Files"):
     f.extend(filenames)
     break
 
