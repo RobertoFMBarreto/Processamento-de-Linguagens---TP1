@@ -1,6 +1,5 @@
 # xml_lexer.py
 import ply.lex as plex
-from html_generator import HtmlGenerator
 from tag_switcher import TagSwitcher
 from text_switcher import TextSwitcher
 from os import walk
@@ -17,6 +16,9 @@ class XMLLex:
     def t_CTAGS(self, t):
         r"</[^>]+>"
         self.text_switcher.currentTag = ''
+        if t.value in self.text_switcher.textOptions:
+            self.text_switcher.currentTag = t.value
+            self.text_switcher.switch(t.value)
         self.tag_switcher.switch(t.value.replace("/", ""))
         pass
 
@@ -39,13 +41,12 @@ class XMLLex:
         self.filenames = files
         self.tag_switcher = TagSwitcher()
         self.text_switcher = TextSwitcher()
-        self.htmlGenerator = HtmlGenerator()
 
     def initialize(self, **kwargs):
         self.lexer = plex.lex(module=self, **kwargs)
 
         for file in filenames:
-
+            self.text_switcher.new_file(file[:1])
             with open(f"Files/{file}", "r") as fh:
                 contents = fh.read()
 
@@ -54,8 +55,7 @@ class XMLLex:
                 pass
 
             print(f"Finished processing: {file[:1]}")
-
-        self.htmlGenerator.iterate_dictionary(self.text_switcher.dic)
+            self.text_switcher.end_file()
 
 
 f = []

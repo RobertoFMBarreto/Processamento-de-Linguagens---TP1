@@ -1,41 +1,55 @@
+from html_generator import HtmlGenerator
+
+
 class TextSwitcher:
 
-    def write_tag(self, write, tag=''):
-        if tag == '':
-            tag = self.currentTag
+    def new_file(self,value):
+        self.htmlGenerator = HtmlGenerator(value)
 
-        self.dic[self.currentHeader][self.currentWord][tag] = write
+    def end_file(self):
+        self.htmlGenerator.end()
 
     def write_header(self, value):
-        self.dic[value] = {}
-        self.currentHeader = value
+        self.htmlGenerator.write_header(value)
 
     def write_orth(self, value):
-        self.dic[self.currentHeader][value] = {}
-        self.currentWord = value
+        self.htmlGenerator.write_word(value)
 
-    def write_def(self, value):
-        self.write_tag(self.dic[self.currentHeader][self.currentWord].get(
-            'def', '') + value.strip(), tag='def')
+    def write_def(self):
+        self.htmlGenerator.write_definition(self.currentdef)
+        self.currentdef=''
 
-    def write_other(self, value):
-        self.dic[self.currentHeader][self.currentWord][self.currentTag] = value.strip()
+    def write_gramgrp(self, value):
+        self.htmlGenerator.write_gramgrp(value)
+
+    def write_etym(self, value):
+        self.htmlGenerator.write_etym(value)
+
+    def add_to_def(self, value):
+        self.currentdef += value.strip()
 
     def switch(self, value):
         func = self.textOptions.get(self.currentTag, "Invalid Argument")
+
         if callable(func):
-            func(value)
+            if self.currentTag == '</def>':
+                func()
+            else:
+                func(value)
         pass
 
     def __init__(self):
+        self.currentTag = ''
+        self.currentdef = ''
+        self.htmlGenerator = None
         self.textOptions = {
             "orth": self.write_orth,
             "head": self.write_header,
-            "def": self.write_def,
-            "gramGrp": self.write_other,
-            "etym": self.write_other,
+            "def": self.add_to_def,
+            "</def>": self.write_def,
+            "gramGrp": self.write_gramgrp,
+            "etym": self.write_etym,
         }
-        self.currentHeader = ''
-        self.currentTag = ''
-        self.currentWord = ''
-        self.dic = {}
+
+
+
