@@ -18,17 +18,17 @@ class TagSwitcher:
             func()
         pass
 
-
     def __init__(self):
         self.isNewWord = False
         self.isNewHeader = False
         self.isDef = False
         self.options = {
-            "<orth>": self.new_word,
-            "<head>": self.new_header,
-            "<gramGrp>": '',
-            "<def>": self.definition,
-            "<etym>": '',
-            "<quote>": '',
-            "<term>": '',
+            "orth": self.new_word,
+            "head": self.new_header,
+            "gramGrp": '',
+            "def": self.definition,
+            "etym": '',
+            "quote": '',
+            "term": '',
+            "usg": '',
         }

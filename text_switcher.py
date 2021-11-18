@@ -25,14 +25,16 @@ class TextSwitcher:
     def write_etym(self, value):
         self.htmlGenerator.write_etym(value)
 
+    def write_usg(self, value):
+        self.htmlGenerator.write_usg(value)
+
     def add_to_def(self, value):
         self.currentdef += value.strip()
 
     def switch(self, value):
         func = self.textOptions.get(self.currentTag, "Invalid Argument")
-
         if callable(func):
-            if self.currentTag == '</def>':
+            if self.currentTag == '/def':
                 func()
             else:
                 func(value)
@@ -46,10 +48,9 @@ class TextSwitcher:
             "orth": self.write_orth,
             "head": self.write_header,
             "def": self.add_to_def,
-            "</def>": self.write_def,
+            "/def": self.write_def,
             "gramGrp": self.write_gramgrp,
             "etym": self.write_etym,
+            "usg": self.write_usg,
         }
-
-
 
