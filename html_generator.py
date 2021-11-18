@@ -27,12 +27,12 @@ class HtmlGenerator:
         self.htmlFile.write(f'<h3>{value}</h3>\n')
         # self.latexFile.append(Subsection(value))
 
-    def write_gramgrp(self, value):
+    """def write_gramgrp(self, value):
         self.htmlFile.write(f'<li>Grp. gram.: {value}</li>\n')
         # self.latexFile.append(value)
 
     def write_phon(self, value):
-        self.htmlFile.write(f'<li>phon: {value}</li>\n')
+        self.htmlFile.write(f'<li>fónica: {value}</li>\n')
         # self.latexFile.append(value)
 
     def write_etym(self, value):
@@ -41,7 +41,11 @@ class HtmlGenerator:
             # self.latexFile.append(value)
 
     def write_usg(self,value):
-        self.htmlFile.write(f'<li>Utilização: {value}</li>\n')
+        self.htmlFile.write(f'<li>Utilização: {value}</li>\n')"""
+
+    def write_li(self, tag, value):
+        self.htmlFile.write(f'<li>{tag}: {value}</li>\n')
+
 
     def write_definition(self, value):
 

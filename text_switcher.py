@@ -19,7 +19,7 @@ class TextSwitcher:
         self.htmlGenerator.write_definition(self.currentdef)
         self.currentdef=''
 
-    def write_gramgrp(self, value):
+    """def write_gramgrp(self, value):
         self.htmlGenerator.write_gramgrp(value)
 
     def write_etym(self, value):
@@ -29,7 +29,10 @@ class TextSwitcher:
         self.htmlGenerator.write_usg(value)
 
     def write_phon(self, value):
-        self.htmlGenerator.write_phon(value)
+        self.htmlGenerator.write_phon(value)"""
+
+    def write_li(self, value):
+        self.htmlGenerator.write_li(self.currentTag,value)
 
     def add_to_def(self, value):
         self.currentdef += value.strip()
@@ -53,10 +56,10 @@ class TextSwitcher:
             "head": self.write_header,
             "def": self.add_to_def,
             "/def": self.write_def,
-            "gramGrp": self.write_gramgrp,
-            "etym": self.write_etym,
+            "gramGrp": self.write_li,
+            "etym": self.write_li,
             "quote": self.add_to_def,
-            "usg": self.write_usg,
-            "phon": self.write_phon,
+            "usg": self.write_li,
+            "phon": self.write_li,
         }
 
