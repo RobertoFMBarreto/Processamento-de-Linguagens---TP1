@@ -31,6 +31,10 @@ class HtmlGenerator:
         self.htmlFile.write(f'<li>Grp. gram.: {value}</li>\n')
         # self.latexFile.append(value)
 
+    def write_phon(self, value):
+        self.htmlFile.write(f'<li>phon: {value}</li>\n')
+        # self.latexFile.append(value)
+
     def write_etym(self, value):
         if value != '':
             self.htmlFile.write(f'<li>Proveniência: {value}</li>\n')

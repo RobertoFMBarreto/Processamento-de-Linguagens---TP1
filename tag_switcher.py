@@ -12,8 +12,11 @@ class TagSwitcher:
         self.isDef = not self.isDef
         pass
 
+    # argument -> tag a verificar se existe e a executar a função
     def switch(self, argument):
+        # verificar se a tag existe e se existir obter o value da tag caso não exista obter um erro
         func = self.options.get(argument, "Invalid Argument")
+        # verificar se o value obtido é uma função
         if callable(func):
             func()
         pass
@@ -31,4 +34,5 @@ class TagSwitcher:
             "quote": '',
             "term": '',
             "usg": '',
+            "phon": '',
         }
