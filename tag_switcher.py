@@ -1,38 +1,65 @@
+from files_generator import FilesGenerator
+
+
 class TagSwitcher:
 
-    def new_word(self):
-        self.isNewWord = not self.isNewWord
-        pass
+    def new_file(self, value):
+        self.filesGenerator = FilesGenerator(value)
 
-    def new_header(self):
-        self.isNewHeader = not self.isNewHeader
-        pass
+    def end_file(self):
+        self.filesGenerator.end()
 
-    def definition(self):
-        self.isDef = not self.isDef
-        pass
+    def write_header(self, value):
+        self.filesGenerator.write_header(value)
 
-    # argument -> tag a verificar se existe e a executar a função
-    def switch(self, argument):
-        # verificar se a tag existe e se existir obter o value da tag caso não exista obter um erro
-        func = self.options.get(argument, "Invalid Argument")
-        # verificar se o value obtido é uma função
+    def write_orth(self, value):
+        if self.currentdef != '':
+            self.write_def()
+        self.filesGenerator.write_word(value)
+
+    def write_nl_def(self):
+        self.currentdef += '\n'
+
+    def write_def(self):
+        self.filesGenerator.write_definition(self.currentdef.strip())
+        self.currentdef = ''
+
+    def write_gramgrp(self, value):
+        self.filesGenerator.write_gramgrp(value)
+
+    def write_etym(self, value):
+        self.filesGenerator.write_etym(value)
+
+    def write_usg(self, value):
+        self.filesGenerator.write_usg(value)
+
+    def write_phon(self, value):
+        self.filesGenerator.write_phon(value)
+
+    def add_to_def(self, value):
+        self.currentdef += value.strip()
+
+    def switch(self, value):
+        func = self.options.get(self.currentTag, "Invalid Argument")
         if callable(func):
-            func()
+            if self.currentTag == '/def':
+                func()
+            else:
+                func(value)
         pass
 
     def __init__(self):
-        self.isNewWord = False
-        self.isNewHeader = False
-        self.isDef = False
+        self.currentTag = ''
+        self.currentdef = ''
+        self.filesGenerator = None
         self.options = {
-            "orth": self.new_word,
-            "head": self.new_header,
-            "gramGrp": '',
-            "def": self.definition,
-            "etym": '',
-            "quote": '',
-            "term": '',
-            "usg": '',
-            "phon": '',
+            "orth": self.write_orth,
+            "head": self.write_header,
+            "def": self.add_to_def,
+            "/def": self.write_nl_def,
+            "gramGrp": self.write_gramgrp,
+            "etym": self.write_etym,
+            "quote": self.add_to_def,
+            "usg": self.write_usg,
+            "phon": self.write_phon,
         }
